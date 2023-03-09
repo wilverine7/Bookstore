@@ -34,6 +34,10 @@ namespace Bookstore
             });
 
             services.AddScoped<IBookstoreRepository, EFBookstoreRepository>();
+
+            services.AddRazorPages();
+            services.AddDistributedMemoryCache();
+            services.AddSession();
         }
 
        
@@ -48,12 +52,38 @@ namespace Bookstore
 
             //uses wwwroot
             app.UseStaticFiles();
+            app.UseSession();
 
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
             {
+                //get both pieces 
+                endpoints.MapControllerRoute(
+                    "categorypage", 
+                    "{category}/Page{pageNum}",
+                    new { Controller = "Home", action = "Index" });
+
+                //get just the page number
+                endpoints.MapControllerRoute(
+                name: "Paging",
+                pattern: "{pageNum}",
+                defaults: new { Controller = "Home", action = "Index", pageNum=1 });
+
+
+                //get just the category
+                endpoints.MapControllerRoute(
+                   "category",
+                   "{category}",
+                   new { Controller = "Home", action = "Index", pageNum = 1 });
+
+                
+                //default
                 endpoints.MapDefaultControllerRoute();
+
+                endpoints.MapRazorPages();
+
+
             });
         }
     }
